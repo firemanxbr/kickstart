@@ -1,0 +1,16 @@
+admin-email = root@spacewalk.mydomain.local
+ssl-set-org = Spacewalk Org
+ssl-set-org-unit = spacewalk
+ssl-set-city = Porto Alegre
+ssl-set-state = RS
+ssl-set-country = BR
+ssl-password = spacewalk
+ssl-set-email = root@spacewalk.mydomain.local
+ssl-config-sslvhost = Y
+db-backend=postgresql
+db-name=spaceschema
+db-user=spaceuser
+db-password=spacepw
+db-host=localhost
+db-port=5432
+enable-tftp=Y

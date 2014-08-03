@@ -1,6 +1,7 @@
 # Spacewalk on Fedora 20
 # Autor: Marcelo Barbosa
 # email: <firemanxbr@fedoraproject.org>
+# ISO Usage: Fedora-20-x86_64-DVD.iso
 
 # text mode installation
 text
@@ -34,11 +35,8 @@ rootpw --iscrypted $6$saltsalt$RhQGGsDK.yRRMNaZ.OeSkuK0KY0k.ipSlA/kUJQ0xBRfE3nzJ
 # Firewall configuration for Spacewalk
 firewall --enabled --ssh --http --https --port=5222:tcp,5269:tcp,69:udp
 
-# New system services for ntp servers
-services --enabled="chronyd"
-
-# Enable ssh service
-services --enabled="sshd"
+# Enable services
+services --enabled=chronyd,sshd
 
 # System timezone with brazilian ntp servers
 timezone America/Sao_Paulo --isUtc --ntpservers=a.ntp.br,b.ntp.br,c.ntp.br
@@ -55,6 +53,7 @@ clearpart --none --initlabel
 # Packages installed
 %packages
 @core
+net-tools
 chrony
 vim
 wget
@@ -63,7 +62,7 @@ wget
 # Pos installed with log
 %post --log=/root/spacewalk2.2-fedora20-ks-post.log
 
-# Spacewalk repository
+# Spacewalk repository for Fedora 20
 yum localinstall -y http://yum.spacewalkproject.org/2.2/Fedora/20/x86_64/spacewalk-repo-2.2-1.fc20.noarch.rpm
 
 # Install jpackage-generic.repo 
@@ -79,8 +78,10 @@ yum install -y spacewalk-setup-postgresql
 # Installing Spacewalk
 yum install -y spacewalk-postgresql 
 
-# Ver a configuração do Spacewalk usando Answer File: https://fedorahosted.org/spacewalk/wiki/HowToInstall#ConfiguringSpacewalkwithanAnswerFile
-
+# Configure Spacewalk 
+cd /root
+wget https://firemanxbr.fedorapeople.org/kickstart/spacewalk-postresql
+spacewalk-setup --disconnected --answer-file=spacewalk-postgresql
 %end
 
 # Reboot after installation
