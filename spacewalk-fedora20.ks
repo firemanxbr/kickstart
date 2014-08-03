@@ -1,7 +1,6 @@
 # Spacewalk on Fedora 20
 # Autor: Marcelo Barbosa
 # email: <firemanxbr@fedoraproject.org>
-# version=RHEL7
 
 # text mode installation
 text
@@ -32,8 +31,19 @@ network  --hostname=spacewalk.mydomain.local
 # print crypt.crypt('spacewalk', '\$6\$saltsalt\$')"
 rootpw --iscrypted $6$saltsalt$RhQGGsDK.yRRMNaZ.OeSkuK0KY0k.ipSlA/kUJQ0xBRfE3nzJsbIYgOBGyyVmVQr.YIeoaLydAcIZvejmS83r/
 
+# Firewall configuration
+firewall --enabled --service=ssh
+firewall --enabled --service=http
+firewall --enabled --service=https
+firewall --enabled --port=5222:tcp
+firewall --enabled --port=5269:tcp
+firewall --enabled --port=69:udp
+
 # New system services for ntp servers
 services --enabled="chronyd"
+
+# Enable ssh service
+services --enabled="sshd"
 
 # System timezone with brazilian ntp servers
 timezone America/Sao_Paulo --isUtc --ntpservers=a.ntp.br,b.ntp.br,c.ntp.br
@@ -54,22 +64,30 @@ firewall --service=ssh
 %packages
 @core
 chrony
+vim
+wget
 %end
 
 # Pos installed with log
-%post --log=/root/chaordic-ks-post.log
-
-# for updating 
-yum upgrade -y
-
-# install utils
-yum install -y vim wget
+%post --log=/root/spacewalk2.2-fedora20-ks-post.log
 
 # Spacewalk repository
 yum localinstall -y http://yum.spacewalkproject.org/2.2/Fedora/20/x86_64/spacewalk-repo-2.2-1.fc20.noarch.rpm
 
+# Install jpackage-generic.repo 
+cd /etc/yum.repos.d/
+wget https://firemanxbr.fedorapeople.org/kickstart/jpackage-generic.repo
+ 
+# Updating system
+yum upgrade -y
+
 # PostgreSQL server, set up by Spacewalk (embedded)
-#yum install -y spacewalk-setup-postgresql 
+yum install spacewalk-setup-postgresql
+
+# Installing Spacewalk
+yum install -y spacewalk-postgresql 
+
+# Ver a configuração do Spacewalk usando Answer File: https://fedorahosted.org/spacewalk/wiki/HowToInstall#ConfiguringSpacewalkwithanAnswerFile
 
 %end
 
