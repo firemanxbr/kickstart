@@ -82,7 +82,7 @@ wget https://firemanxbr.fedorapeople.org/kickstart/jpackage-generic.repo
 yum upgrade -y
 
 # PostgreSQL server, set up by Spacewalk (embedded)
-yum install spacewalk-setup-postgresql
+yum install -y spacewalk-setup-postgresql
 
 # Installing Spacewalk
 yum install -y spacewalk-postgresql 
