@@ -1,0 +1,16 @@
+---------------------------
+| Spacewalk Configuration |
+---------------------------
+
+1) Active your default key:
+
+   Systems -> Activation keys:
+	Click on "create new key"
+
+   Description: 	default key
+   Universal default: 	checked
+
+2) Enable monitoring suport:
+
+   Admin -> Spacewalk Configuration: 
+	Checked "Enable Monitoring"
