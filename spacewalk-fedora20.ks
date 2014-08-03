@@ -1,4 +1,4 @@
-# Spacewalk on CentOS 7
+# Spacewalk on Fedora 20
 # Autor: Marcelo Barbosa
 # email: <firemanxbr@fedoraproject.org>
 # version=RHEL7
@@ -25,7 +25,7 @@ lang en_US.UTF-8
 
 # Network information 
 network  --bootproto=dhcp --device=eth0 --ipv6=auto --activate
-network  --hostname=spacewalk.centos.local
+network  --hostname=spacewalk.mydomain.local
 
 # Root password 
 # python -c "import crypt, getpass, pwd; \
@@ -59,9 +59,6 @@ chrony
 # Pos installed with log
 %post --log=/root/chaordic-ks-post.log
 
-# EPEL - Extra Packages for Enterprise Linux 7
-yum localinstall -y http://download.fedoraproject.org/pub/epel/beta/7/x86_64/epel-release-7-0.2.noarch.rpm
-
 # for updating 
 yum upgrade -y
 
@@ -69,10 +66,10 @@ yum upgrade -y
 yum install -y vim wget
 
 # Spacewalk repository
-yum localinstall -y http://yum.spacewalkproject.org/2.2/RHEL/7/x86_64/spacewalk-repo-2.2-1.el7.noarch.rpm
+yum localinstall -y http://yum.spacewalkproject.org/2.2/Fedora/20/x86_64/spacewalk-repo-2.2-1.fc20.noarch.rpm
 
 # PostgreSQL server, set up by Spacewalk (embedded)
-yum install -y spacewalk-setup-postgresql 
+#yum install -y spacewalk-setup-postgresql 
 
 %end
 
