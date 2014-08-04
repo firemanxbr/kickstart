@@ -33,7 +33,7 @@ network  --hostname=challenge.chaordic.com.br
 rootpw --iscrypted $6$saltsalt$kDZeMnpKFLVZzkhrZKX6lR7sWz.C3awOStw76u6qVq0QdpYFQwF/dpchq/QA7yoEe4wBFsA2TnWcNcEap3TKf.
 
 # New system services for ntp servers
-services --enabled=chronyd,sshd
+services --enabled=chronyd,sshd,httpd,mariadb
 
 # System timezone with brazilian ntp servers
 timezone America/Sao_Paulo --isUtc --ntpservers=a.ntp.br,b.ntp.br,c.ntp.br
@@ -48,7 +48,7 @@ autopart --type=lvm
 clearpart --none --initlabel 
 
 # Firewall configuration
-firewall --enabled --ssh
+firewall --enabled --ssh --http --https --port=8080:tcp,9990:tcp
 
 # Packages installed
 %packages
@@ -56,6 +56,10 @@ firewall --enabled --ssh
 chrony
 vim
 wget
+net-tools
+httpd
+mod_cluster
+mariadb
 %end
 
 # Pos installed with log
@@ -69,6 +73,50 @@ yum localinstall -y http://yum.spacewalkproject.org/2.2-client/RHEL/7/x86_64/spa
 
 # for updating 
 yum upgrade -y
+
+# Install MariaDB-Galera
+yum install -y mariadb-galera-server mariadb-galera-common
+
+cd /opt
+wget https://firemanxbr.fedorapeople.org/kickstart/my.cnf
+mv -f /opt/my.cnf /etc/my.cnf
+
+# Install Zabbix Agent
+yum install -y zabbix20-agent
+systemctl enable zabbix-agent.service
+
+# Install Java for Oracle 
+# Verify config java/jar/javac using: "alternatives --config java" and "jar" and "javac"
+cd /opt
+wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/7u65-b17/jdk-7u65-linux-x64.tar.gz"
+tar zxvf jdk-7u65-linux-x64.tar.gz
+cd /opt/jdk1.7.0_65/
+alternatives --install /usr/bin/java java /opt/jdk1.7.0_65/bin/java 2
+lternatives --set java /opt/jdk1.7.0_65/bin/java
+alternatives --install /usr/bin/jar jar /opt/jdk1.7.0_65/bin/jar 2
+alternatives --install /usr/bin/javac javac /opt/jdk1.7.0_65/bin/javac 2
+alternatives --set jar /opt/jdk1.7.0_65/bin/jar
+alternatives --set javac /opt/jdk1.7.0_65/bin/javac 
+export JAVA_HOME=/opt/jdk1.7.0_65
+export JRE_HOME=/opt/jdk1.7.0_65/jre
+export PATH=$PATH:/opt/jdk1.7.0_65/bin:/opt/jdk1.7.0_65/jre/bin
+
+# Install WildFly 8.1.0
+cd /opt
+wget http://download.jboss.org/wildfly/8.1.0.Final/wildfly-8.1.0.Final.tar.gz
+tar zxvf wildfly-8.1.0.Final.tar.gz
+mv wildfly-8.1.0.Final wildfly
+cd /etc/default/
+wget https://firemanxbr.fedorapeople.org/kickstart/wildfly.conf
+cp /opt/wildfly/bin/init.d/wildfly-init-redhat.sh /etc/init.d/wildfly
+chkconfig --level 3 wildfly on
+adduser wildfly
+gpasswd -a wildfly wildfly
+sed 's/127.0.0.1/0.0.0.0/g' /opt/wildfly/standalone/configuration/standalone.xml > /opt/wildfly/standalone/configuration/standalone.xml.new
+mv -f /opt/wildfly/standalone/configuration/standalone.xml.new /opt/wildfly/standalone/configuration/standalone.xml
+mkdir /var/log/wildfly
+chown wildfly.wildfly /var/log/wildfly
+chown wildfly.wildfly -R /opt/wildfly
 
 %end
 

@@ -56,6 +56,7 @@ firewall --enabled --ssh
 chrony
 vim
 wget
+net-tools
 %end
 
 # Pos installed with log
